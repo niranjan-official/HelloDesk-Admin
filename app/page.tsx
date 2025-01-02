@@ -3,9 +3,6 @@ import TabBody from "@/components/TabBody";
 import {
     Table,
     TableBody,
-    TableCaption,
-    TableCell,
-    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -13,6 +10,8 @@ import {
 import { db } from "@/firebase";
 import { Token } from "@/types";
 import { collection, getDocs } from "firebase/firestore";
+
+export const revalidate = 0;
 
 const getTokens = async () => {
     try {
@@ -49,9 +48,9 @@ export default async function Home() {
                     ))}
                 </TableBody>
             </Table>
-                <div className="mt-10">
-                    <Counter />
-                </div>
+            <div className="mt-10">
+                <Counter />
+            </div>
         </div>
     );
 }
