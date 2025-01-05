@@ -1,4 +1,7 @@
+"use client";
+import { useEffect, useState } from "react";
 import Counter from "@/components/Counter";
+import Header from "@/components/Header";
 import TabBody from "@/components/TabBody";
 import {
     Table,
@@ -8,48 +11,62 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { db } from "@/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 import { Token } from "@/types";
-import { collection, getDocs } from "firebase/firestore";
 
-export const revalidate = 0;
+export default function Home() {
+    const [tokens, setTokens] = useState<Token[]>([]);
+    const [currentToken, setCurrentToken] = useState<number>(-1);
 
-const getTokens = async () => {
-    try {
-        let data: Token[] = [];
-        const querySnapshot = await getDocs(collection(db, "tokens"));
-        querySnapshot.forEach((doc: any) => {
-            data.push({ id: doc.id, ...doc.data() });
-            console.log(doc.id, " => ", doc.data());
+    useEffect(() => {
+        const unsubscribe = onSnapshot(collection(db, "tokens"), (snapshot) => {
+            const data = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+            })) as Token[];
+
+            const sortedTokens = data.sort(
+                (a, b) => Number(a.id) - Number(b.id)
+            );
+
+            setTokens(sortedTokens);
         });
-        return data;
-    } catch (error: any) {
-        console.log(error.message);
-    }
-    return null;
-};
 
-export default async function Home() {
-    const tokens = await getTokens();
-    console.log(tokens);
+        return () => unsubscribe();
+    }, []);
+
     return (
-        <div className="h-screen w-full bg-slate-50 flex flex-col justify-center items-center p-4 sm:p-16 sm:px-44">
-            <Table className="border">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-[100px]">Token</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Phone no:</TableHead>
-                        <TableHead className="text-right">Status</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {tokens?.map((token) => (
-                        <TabBody tokenData={token} />
-                    ))}
-                </TableBody>
-            </Table>
-            <div className="mt-10">
-                <Counter />
+        <div className="min-h-screen w-full bg-slate-50 flex flex-col">
+            <Header />
+            <div className="mt-8 flex flex-col w-full items-center">
+                <Table className="border-2 max-w-5xl max-h-[400px]">
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[100px]">Token</TableHead>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Year</TableHead>
+                            <TableHead>Dept</TableHead>
+                            <TableHead>Time</TableHead>
+                            <TableHead>Phone no:</TableHead>
+                            <TableHead className="text-right">Status</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {tokens?.slice(-7).map((token) => (
+                            <TabBody
+                                key={token.id}
+                                tokenData={token}
+                                isActive={currentToken?.toString() === token.id}
+                            />
+                        ))}
+                    </TableBody>
+                </Table>
+                <div className="mt-10">
+                    <Counter
+                        setCurrentTableToken={setCurrentToken}
+                        tokens={tokens}
+                    />
+                </div>
             </div>
         </div>
     );
