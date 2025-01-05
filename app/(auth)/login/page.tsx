@@ -62,7 +62,7 @@ const page = () => {
       >
         <div className="flex flex-col items-center justify-end">
           <Image src={"/prc-official.png"} width={120} height={120} alt=".." />
-          <p className="mt-4 text-3xl font-semibold tracking-wide">Login to Admin Panel</p>
+          <p className="mt-4 text-2xl sm:text-3xl font-semibold tracking-wide">Login to Admin Panel</p>
           <p className="text-sm">Enter your credential to login</p>
           <hr className="mt-3 w-3/4 bg-black/10" />
         </div>
