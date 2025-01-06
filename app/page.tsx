@@ -13,10 +13,12 @@ import {
 import { db } from "@/firebase";
 import { collection, onSnapshot } from "firebase/firestore";
 import { Token } from "@/types";
+import { useAuth } from "@/firebase/auth";
 
 export default function Home() {
     const [tokens, setTokens] = useState<Token[]>([]);
     const [currentToken, setCurrentToken] = useState<number>(-1);
+  const User = useAuth();
 
     useEffect(() => {
         const unsubscribe = onSnapshot(collection(db, "tokens"), (snapshot) => {
